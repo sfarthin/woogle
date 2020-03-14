@@ -1,0 +1,30 @@
+{
+  "description": "A basic Google search engine",
+  "scripts": {
+    "test": "tsc && jest"
+  },
+  "author": "Steve Farthing",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.8.7",
+    "@babel/plugin-transform-modules-commonjs": "^7.8.3",
+    "@babel/preset-typescript": "^7.8.3",
+    "@types/cheerio": "^0.22.16",
+    "@types/jest": "^25.1.4",
+    "@types/node": "^13.9.1",
+    "@types/node-fetch": "^2.5.5",
+    "eslint": "^6.8.0",
+    "jest": "^25.1.0",
+    "nock": "^12.0.2",
+    "prettier": "^1.19.1",
+    "typescript": "^3.8.3",
+    "webpack": "^4.42.0"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.3",
+    "combine-async-iterators": "^1.1.2",
+    "node-fetch": "^2.6.0",
+    "normalize-url": "^5.0.0"
+  }
+}
