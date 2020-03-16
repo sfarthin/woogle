@@ -30,7 +30,7 @@ export default async function crawl(_url: string): Promise<Page> {
   }
 
   // Throw errors for non-HTML pages.
-  if (res.headers.get('content-type') === 'text/html') {
+  if (!(res.headers.get('content-type') || '').match('text/html')) {
     throw new Error('not an HTML page');
   }
 
@@ -46,9 +46,10 @@ export default async function crawl(_url: string): Promise<Page> {
     .toArray()
     // Get the href attribute for each anchor tag
     .map(el => $(el).attr('href') || '')
-    // remove any anchor tags that are empty
-    .filter(t => t)
+    // remove any anchor tags that are empty or have javascript
+    .filter(t => t && !t.match('javascript:'))
     // get full URL from relative href. aka "/page" => "http://domain/page"
+    // and normalize the url, aka removing trailing slash, order query strings, etc
     .map(href => normalizeUrl(resolveUrl(url, href)));
 
   return {

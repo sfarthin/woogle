@@ -1,6 +1,6 @@
-// Useful when you need to display, store, deduplicate, sort, compare, etc, URLs
 import normalizeUrl from 'normalize-url';
 
+// Used to deduplicate URLs
 export default (str: string) =>
   normalizeUrl(str, {
     // Lets not duplicate pages for https/http

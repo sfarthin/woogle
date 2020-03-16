@@ -5,8 +5,8 @@ export type Page = {
 };
 
 export type SimpleQueue = {
-  registerWorker: () => void;
-  unRegisterWorker: () => void;
+  registerCrawlers: (i: number) => void;
+  unRegisterCrawlers: (i: number) => void;
   enqueue: (newQueuedItems: string[]) => Promise<void>;
   dequeue: () => Promise<string | void>;
 };

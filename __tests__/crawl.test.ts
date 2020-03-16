@@ -1,10 +1,13 @@
 import nock from 'nock';
 import crawl from '../crawl';
 import Queue from '../queue';
-import { Worker, WorkerPool } from '../worker';
+import Worker from '../worker';
 
 nock('https://stevefar.com')
   .persist() // <-- persist past the first request
+  .defaultReplyHeaders({
+    'Content-Type': 'text/html'
+  })
   .get('/')
   .reply(
     200,
@@ -91,80 +94,62 @@ test('Can find title and link for a single page', async () => {
 test('Stage 1 - crawl all pages', async () => {
   const queue = Queue();
 
-  queue.enqueue(['https://stevefar.com/page1']);
+  queue.enqueue(['https://stevefar.com']);
 
   // Create a worker iterator
-  const worker = Worker(queue);
+  const pages = Worker(queue, crawl);
 
   const results = [];
-  for await (let page of worker) {
+  for await (let page of pages) {
     results.push(page);
   }
 
-  const sortedResults = results.sort((a, b) => (a.url > b.url ? 1 : -1));
-
-  expect(sortedResults).toEqual(expectedResult);
+  expect(results).toEqual(expectedResult);
 });
 
 test('Stage 1 - hit limit', async () => {
-  const queue = Queue();
-  const limit = 3;
+  const queue = Queue(3);
 
   queue.enqueue(['https://stevefar.com']);
 
   // Create a worker iterator
-  const worker = Worker(queue);
+  const pages = Worker(queue, crawl);
 
   const results = [];
-  for await (let page of worker) {
+  for await (let page of pages) {
     results.push(page);
-
-    if (results.length === limit) {
-      break;
-    }
   }
 
-  const sortedResults = results.sort((a, b) => (a.url > b.url ? 1 : -1));
-
-  expect(sortedResults).toEqual(expectedResult.slice(0, 3));
+  expect(results).toEqual(expectedResult.slice(0, 3));
 });
 
 test('Stage 2 - crawl all pages', async () => {
   const queue = Queue();
 
-  queue.enqueue(['https://stevefar.com/page1']);
+  queue.enqueue(['https://stevefar.com']);
 
-  // Create a worker iterator
-  const worker = WorkerPool(queue, 2);
+  const pages = Worker(queue, crawl, 2);
 
   const results = [];
-  for await (let page of worker) {
+  for await (let page of pages) {
     results.push(page);
   }
 
-  const sortedResults = results.sort((a, b) => (a.url > b.url ? 1 : -1));
-
-  expect(sortedResults).toEqual(expectedResult);
+  expect(results).toEqual(expectedResult);
 });
 
 test('Stage 2 - hit limit', async () => {
   // Lets create a queue with a limit of 3 pages.
-  const queue = Queue();
-  const limit = 3;
+  const queue = Queue(3);
 
   queue.enqueue(['https://stevefar.com']);
 
-  const workers = WorkerPool(queue, 2);
+  const pages = Worker(queue, crawl, 20);
 
   const results = [];
-  for await (let page of workers) {
+  for await (let page of pages) {
     results.push(page);
-    if (results.length === limit) {
-      break;
-    }
   }
 
-  const sortedResults = results.sort((a, b) => (a.url > b.url ? 1 : -1));
-
-  expect(sortedResults).toEqual(expectedResult.slice(0, 3));
+  expect(results).toEqual(expectedResult.slice(0, 3));
 });
